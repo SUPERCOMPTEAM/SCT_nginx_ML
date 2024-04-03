@@ -14,14 +14,16 @@ class Upstream:
             datetime.timedelta(seconds=random.randint(1, 3)),
             datetime.timedelta(seconds=random.randint(1, 3))
         ]
-        
+
         unsorted_request_list = [
             Request(
-                datetime.datetime.now() - datetime.timedelta(seconds=random.randint(0, time_interval.total_seconds())), 
+                datetime.datetime.now() - datetime.timedelta(seconds=random.randint(0,
+                                                                                    int(time_interval.total_seconds()))),
                 random.choice(solve_times)
             ) for _ in range(request_count)
         ]
-        self.request_list = sorted(unsorted_request_list, key=lambda x: x.start_time)
+        self.request_list = sorted(
+            unsorted_request_list, key=lambda x: x.start_time)
 
         self.server_list: list[Server] = [
             Server(
@@ -39,10 +41,11 @@ class Upstream:
         random.shuffle(server_idx_list)
 
         for i, request in enumerate(self.request_list):
-            self.server_list[server_idx_list[i % len(server_idx_list)]].add_request(request)
-        
+            self.server_list[server_idx_list[i %
+                                             len(server_idx_list)]].add_request(request)
+
         callbacks = []
         for i, server in enumerate(self.server_list):
             callbacks.append(server.process_requests())
-        
+
         return UpstreamCallback(callbacks)

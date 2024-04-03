@@ -4,19 +4,20 @@ import random
 from models.server.server_callback import ServerCallback
 from models.request.request import Request
 
+
 class Server:
     def __init__(self, speed: float, safety: float, total_time: datetime.timedelta) -> None:
         self.requests: list[Request] = []
         self.solved_requests: list[Request] = []
         self.unsolved_requests: list[Request] = []
-        
+
         self.speed: float = speed
         self.safety: float = safety
         self.active: bool = True
         self.overtime: bool = False
 
         self.total_time: datetime.timedelta = total_time
-    
+
     def __str__(self) -> str:
         res = "Solved:\n"
         for request in self.solved_requests:
@@ -35,7 +36,8 @@ class Server:
         sorted_requests = sorted(self.requests, key=lambda x: x.start_time)
 
         start_time: datetime.datetime = sorted_requests[0].start_time.replace()
-        current_time: datetime.datetime = sorted_requests[0].start_time.replace()
+        current_time: datetime.datetime = sorted_requests[0].start_time.replace(
+        )
         for request in sorted_requests:
             if random.random() > self.safety:
                 self.active = False
@@ -55,7 +57,7 @@ class Server:
                 self.unsolved_requests.append(request)
 
             current_time = request.end_time.replace()
-        
+
         if self.solved_requests:
             if self.solved_requests[-1].end_time > start_time + self.total_time:
                 self.solved_requests[-1].cancel()

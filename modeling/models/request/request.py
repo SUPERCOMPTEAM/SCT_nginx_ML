@@ -3,10 +3,12 @@ from enum import Enum
 import random
 # TODO: добавить время IObaund
 
+
 class RequestStatus(Enum):
     SolveRequest = 1
     DontSolveRequest = 3
     BadRequest = 2
+
 
 class Request:
     def __init__(self, start_time: datetime.datetime, solve_time: datetime.timedelta) -> None:
@@ -23,12 +25,13 @@ class Request:
 
     def solve(self, speed: int) -> None:
         self.status = RequestStatus.SolveRequest
-        self.end_time = self.start_time + self.wait_time + (self.solve_time / speed)
-    
+        self.end_time = self.start_time + \
+            self.wait_time + (self.solve_time / speed)
+
     def cancel(self):
         self.status = RequestStatus.BadRequest
         self.end_time = self.start_time
-    
+
     def ignore(self):
         self.status = RequestStatus.DontSolveRequest
         self.end_time = self.start_time
@@ -37,5 +40,6 @@ class Request:
         return self.start_time + self.wait_time
 
     def __str__(self) -> str:
-        end_time_str = str(self.end_time) if self.end_time else "Not solved yet"
+        end_time_str = str(
+            self.end_time) if self.end_time else "Not solved yet"
         return f"{self.status.name} - {self.start_time} - {self.solve_time} - {self.wait_time} - {end_time_str}"
