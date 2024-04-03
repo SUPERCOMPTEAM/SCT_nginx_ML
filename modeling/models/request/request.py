@@ -28,6 +28,10 @@ class Request:
     def cancel(self):
         self.status = RequestStatus.BadRequest
         self.end_time = self.start_time
+    
+    def ignore(self):
+        self.status = RequestStatus.DontSolveRequest
+        self.end_time = self.start_time
 
     def get_start_solve_time(self) -> datetime.datetime:
         return self.start_time + self.wait_time

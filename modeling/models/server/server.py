@@ -13,6 +13,7 @@ class Server:
         self.speed: float = speed
         self.safety: float = safety
         self.active: bool = True
+        self.overtime: bool = False
 
         self.total_time: datetime.timedelta = total_time
     
@@ -40,20 +41,24 @@ class Server:
                 self.active = False
 
             if self.total_time < current_time - start_time:
-                self.active = False
+                self.overtime = True
 
-            if not self.active:
+            if not self.active and not self.overtime:
                 request.cancel()
                 self.unsolved_requests.append(request)
-            else:
+            elif not self.overtime:
                 request.wait(current_time - request.start_time)
                 request.solve(self.speed)
                 self.solved_requests.append(request)
+            else:
+                request.ignore()
+                self.unsolved_requests.append(request)
 
             current_time = request.end_time.replace()
         
-        if self.solved_requests[-1].end_time > start_time + self.total_time:
-            self.solved_requests[-1].cancel()
-            self.unsolved_requests.append(self.solved_requests.pop())
+        if self.solved_requests:
+            if self.solved_requests[-1].end_time > start_time + self.total_time:
+                self.solved_requests[-1].cancel()
+                self.unsolved_requests.append(self.solved_requests.pop())
 
         return ServerCallback(self.solved_requests, self.unsolved_requests, self.total_time)

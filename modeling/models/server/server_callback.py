@@ -8,8 +8,12 @@ class ServerCallback:
     complete_factor: float = None
     overload_factor: float = None
     downtime_factor: float = None
+    solved_requests: list[Request] = []
+    unsolved_request: list[Request] = []
 
     def __init__(self, solved_requests: list[Request], unsolved_request: list[Request], total_time: datetime.timedelta) -> None:
+        self.solved_requests = solved_requests
+        self.unsolved_request = unsolved_request
         self.complete_factor = ServerCallback.solve_complete_factor(solved_requests, unsolved_request)
         self.overload_factor = ServerCallback.solve_overload_factor(solved_requests, total_time)
         self.downtime_factor = ServerCallback.solve_downtime_factor(solved_requests, total_time)

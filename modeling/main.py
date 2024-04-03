@@ -1,9 +1,7 @@
 import datetime
 from models import Upstream
 
-upstream = Upstream(5, 100, datetime.timedelta(seconds=10))
-upstream.start_round_robin([1, 1, 1, 1, 1])
-print(upstream)
+print(Upstream(4, 100, datetime.timedelta(seconds=10)).start_round_robin([1, 1, 1, 1]))
 
 
 # from models import Request
