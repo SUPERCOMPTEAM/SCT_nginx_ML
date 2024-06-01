@@ -1,12 +1,10 @@
-import datetime
 import random
 
-from models.server.server_callback import ServerCallback
 from models.request.request import Request
 
 
 class Server:
-    def __init__(self, speed: float, safety: float, total_time: datetime.timedelta) -> None:
+    def __init__(self, speed: float, safety: float) -> None:
         self.requests: list[Request] = []
         self.solved_requests: list[Request] = []
         self.unsolved_requests: list[Request] = []
@@ -15,8 +13,6 @@ class Server:
         self.safety: float = safety
         self.active: bool = True
         self.overtime: bool = False
-
-        self.total_time: datetime.timedelta = total_time
 
     def __str__(self) -> str:
         res = "Solved:\n"
@@ -30,19 +26,18 @@ class Server:
     def add_request(self, req: Request) -> None:
         self.requests.append(req)
 
-    def process_requests(self) -> ServerCallback:
+    def process_requests(self, max_time: float) -> tuple[int, int]:
         if len(self.requests) == 0:
-            return
+            return 0, 0
         sorted_requests = sorted(self.requests, key=lambda x: x.start_time)
 
-        start_time: datetime.datetime = sorted_requests[0].start_time.replace()
-        current_time: datetime.datetime = sorted_requests[0].start_time.replace(
-        )
+        start_time: float = float(sorted_requests[0].start_time)
+        current_time: float = float(sorted_requests[0].start_time)
         for request in sorted_requests:
             if random.random() > self.safety:
                 self.active = False
 
-            if self.total_time < current_time - start_time:
+            if max_time < current_time - start_time:
                 self.overtime = True
 
             if not self.active and not self.overtime:
@@ -56,11 +51,11 @@ class Server:
                 request.ignore()
                 self.unsolved_requests.append(request)
 
-            current_time = request.end_time.replace()
+            current_time = float(request.end_time)
 
         if self.solved_requests:
-            if self.solved_requests[-1].end_time > start_time + self.total_time:
+            if self.solved_requests[-1].end_time > start_time + max_time:
                 self.solved_requests[-1].cancel()
                 self.unsolved_requests.append(self.solved_requests.pop())
 
-        return ServerCallback(self.solved_requests, self.unsolved_requests, self.total_time)
+        return len(self.requests), len(self.solved_requests)
