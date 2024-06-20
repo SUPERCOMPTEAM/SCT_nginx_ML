@@ -1,4 +1,4 @@
-def translate_neuro_weights(weights: list[int], server_count: int) -> list[float]:
+def translate_neuro_weights(weights: list[int | float], server_count: int) -> list[float]:
     general_size = len(weights) / server_count
     servers = [0 for _ in range(server_count)]
 

@@ -11,22 +11,29 @@ from models import Upstream
 
 
 class NginxEnv(Env):
-    def __init__(self):
-        self.upstream = Upstream(random.randint(1, 10), 10, 100)
+    upstream: Upstream
 
-        self.action_space = Box(low=0, high=1, shape=(100,))
-        self.observation_space = Box(0, 100, shape=(200,))
+    def _init_upstream(self):
+        self.upstream = Upstream(self.server_count, self.request_limit, self.server_count)
+
+    def __init__(self):
+        self.server_count = 5
+        self.request_limit = 100
+        self._init_upstream()
+
+        self.action_space = Box(low=0, high=1, shape=(self.server_count,))
+        self.observation_space = Box(-100, 100, shape=(self.server_count*3,))
         self.state = self.upstream.step(self.action_space.sample()).state
-        self.max_steps = 100
+        self._max_episode_steps = 20
 
     def step(self, action):
-        self.max_steps -= 1
+        self._max_episode_steps -= 1
 
         callback = self.upstream.step(action)
 
         reward = callback.reward
 
-        if self.max_steps == 0:
+        if self._max_episode_steps == 0:
             done = True
         else:
             done = False
@@ -39,8 +46,8 @@ class NginxEnv(Env):
         pass
 
     def reset(self, *, seed: Optional[int] = None, options: Optional[dict] = None):
-        self.upstream = Upstream(random.randint(1, 10), 10, 100)
+        self._init_upstream()
         self.state = self.upstream.step(self.action_space.sample()).state
-        self.max_steps = 100
+        self._max_episode_steps = 20
 
         return self.state

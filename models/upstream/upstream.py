@@ -59,7 +59,8 @@ class Upstream:
             max_time = 0
             if len(server.requests) > 0:
                 max_time = server.requests[len(server.requests) - 1].start_time + 5
-            callbacks.append(server.process_requests(max_time))
+            r, a = server.process_requests(max_time)
+            callbacks.append((r, a, weights[i]))
 
         return UpstreamCallback(callbacks, self.state_size)
 
